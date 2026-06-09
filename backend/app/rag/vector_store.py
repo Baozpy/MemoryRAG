@@ -35,6 +35,8 @@ class VectorStore:
                 continue
 
             meta = self.metadata[idx]
+            if not meta.get("is_active", True):
+                continue
 
             meta["retrieval_count"] = meta.get("retrieval_count", 0) + 1
 

@@ -32,7 +32,8 @@ def upload_text(req: UploadTextRequest):
         "type": "document",
         "importance": 0.8,
         "retrieval_count": 0,
-        "memory_score": 0.8
+        "memory_score": 0.8,
+        "is_active": True,
     }
     for _ in chunks
 ]
