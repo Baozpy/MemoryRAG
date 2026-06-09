@@ -1,157 +1,116 @@
 # MemoryRAG
 
+MemoryRAG is a long-term conversational memory retrieval system built with FastAPI, React, FAISS, and SentenceTransformers.
 
-A long-term conversational memory RAG system with memory decay, retrieval reinforcement, analytics, and visualization.
-
----
-
-## Overview
-
-MemoryRAG extends a traditional Retrieval-Augmented Generation (RAG) pipeline by introducing:
-
-- Semantic Retrieval
-- Memory Score
-- Retrieval Reinforcement
-- Memory Decay
-- Analytics Dashboard
-- Memory Evolution Tracking
-
-Instead of ranking memories only by embedding similarity, MemoryRAG combines:
-
-Combined Score = Semantic Score × Memory Score
-
-where Memory Score is dynamically updated based on:
-
-- Importance
-- Retrieval Frequency
-- Last Access Time
-
-This allows important memories to become stronger through repeated use while less relevant memories gradually decay.
+The system extends traditional Retrieval-Augmented Generation (RAG) by introducing memory reinforcement, memory decay, memory analytics, forgetting mechanisms, and automatic memory updates.
 
 ---
 
-## Architecture
+# Features
 
-```
-User Query
-     │
-     ▼
-Sentence Transformer
-     │
-     ▼
-FAISS Vector Store
-     │
-     ▼
-Semantic Search
-     │
-     ▼
-Memory Score Re-ranking
-     │
-     ▼
-Top Memories
-     │
-     ▼
-LLM Response
-```
+- Semantic memory retrieval using FAISS
+- Memory score reinforcement through repeated retrieval
+- Time-aware memory decay
+- Automatic memory forgetting
+- Memory analytics dashboard
+- Memory score visualization
+- Agent-based memory creation
+- Full-stack implementation with FastAPI and React
 
 ---
 
-## Features
+# Dashboard
 
-### Long-Term Memory
+![Dashboard](docs/dashboard.png)
 
-Store documents and conversational memories.
+The dashboard provides:
 
-### Retrieval Reinforcement
-
-Frequently used memories gain higher scores.
-
-### Memory Decay
-
-Unused memories gradually lose influence.
-
-### Memory Analytics
-
-Track:
-
-- Memory Score
-- Retrieval Count
-- Last Access Time
-
-### Dashboard
-
-Built with React.
-
-Includes:
-
-- Memory Upload
-- Chat Interface
-- Retrieved Memories
-- Top Memories
-- Memory Score Curve
+- Total memory count
+- Average memory score
+- Average retrieval count
+- Memory upload interface
+- Interactive chat interface
 
 ---
 
-## Project Structure
+# Memory Score Visualization
+
+![Memory Score Curve](docs/memory_curve.png)
+
+Memory scores evolve over time according to:
+
+- Retrieval frequency
+- Importance weighting
+- Memory decay
+
+The curve visualizes how memories strengthen or weaken throughout usage.
+
+---
+
+# Retrieval Example
+
+### Retrieved Context
+
+![Retrieval Example 1](docs/retrieval_1.png)
+
+### Memory Ranking
+
+![Retrieval Example 2](docs/retrieval_2.png)
+
+### Top Memories
+
+![Retrieval Example 3](docs/retrieval_3.png)
+
+Retrieved memories are ranked using:
 
 ```text
-MemoryRAG
-│
-├── backend
-│   ├── app
-│   │   ├── api
-│   │   │   ├── chat.py
-│   │   │   ├── documents.py
-│   │   │   ├── memory.py
-│   │   │   └── analytics.py
-│   │   │
-│   │   ├── memory
-│   │   │   └── memory_decay.py
-│   │   │
-│   │   ├── vectorstore
-│   │   │   └── vector_store.py
-│   │   │
-│   │   ├── core
-│   │   │   ├── llm.py
-│   │   │   └── state.py
-│   │   │
-│   │   └── main.py
-│   │
-│   └── requirements.txt
-│
-└── frontend
-    ├── src
-    │   ├── App.jsx
-    │   └── App.css
-    │
-    └── package.json
+combined_score = semantic_score × memory_score
+```
+
+This allows important memories to be prioritized even when semantic similarity is comparable.
+
+---
+
+# Architecture
+
+```text
+User Query
+    ↓
+Embedding Model
+    ↓
+FAISS Vector Store
+    ↓
+Memory Retrieval
+    ↓
+Memory Score Re-ranking
+    ↓
+Context Construction
+    ↓
+Response Generation
+    ↓
+Memory Agent
+    ↓
+Automatic Memory Update
 ```
 
 ---
 
-## Memory Score
+# Memory Scoring
 
-Memory Score is computed using:
+Memory strength is determined by:
 
-```python
-memory_score =
-importance *
-(1 + log(1 + retrieval_count))
-*
-exp(-decay_rate * time_since_last_access)
+```text
+Memory Score =
+Importance × Retrieval Reinforcement × Recency Factor
 ```
 
-where:
-
-- importance = memory importance
-- retrieval_count = number of successful retrievals
-- time_since_last_access = recency factor
+Frequently accessed memories gain higher scores, while inactive memories gradually decay.
 
 ---
 
-## API Endpoints
+# APIs
 
-### Upload Memory
+## Upload Memory
 
 ```http
 POST /documents/upload_text
@@ -161,144 +120,214 @@ Example:
 
 ```json
 {
-  "text": "Alex studies memory decay in VLMs.",
-  "source": "test"
+  "text": "Bao studies memory decay in vision-language models.",
+  "source": "frontend_upload"
 }
 ```
 
 ---
 
-### Chat
+## Chat
 
 ```http
-POST /chat
+POST /chat/
 ```
 
 Example:
 
 ```json
 {
-  "query": "What does Alex study?",
+  "query": "What does Bao study?",
   "top_k": 5
 }
 ```
 
 ---
 
-### Memory
+## Memory Analytics
 
 ```http
-GET /memory
-```
-
-Returns all stored memories.
-
----
-
-### Analytics
-
-```http
-GET /analytics
+GET /analytics/
 ```
 
 Returns:
 
+- total memories
 - average memory score
 - average retrieval count
 - top memories
 
 ---
 
-### Memory History
+## Memory History
 
 ```http
 GET /analytics/history
 ```
 
-Returns historical memory score evolution.
+Returns historical memory score trajectories.
 
 ---
 
-## Dashboard
-![Dashboard](docs/dashboard.png)
+## Forgetting Candidates
 
-### Analytics
-
-- Total Memories
-- Average Memory Score
-- Average Retrieval Count
-
-### Chat
-
-- Ask questions
-- Retrieve memories
-- View scores
-
-### Memory Score Curve
-![Memory Curve](docs/memory_curve.png)
-
-Visualize how memory strength evolves over time.
-
----
-
-## Example
-
-Memory:
-
-```text
-Alex likes machine learning research.
-Alex studies memory decay in VLMs.
-MemoryRAG remembers important information.
+```http
+GET /memory/forget_candidates
 ```
-![Retrieval](docs/retrieval_1.png)
-![Retrieval](docs/retrieval_2.png)
-![Retrieval](docs/retrieval_2.png)
 
-After repeated retrieval:
-
-| Retrieval Count | Memory Score |
-| --------------- | ------------ |
-| 1               | 1.29         |
-| 2               | 1.62         |
-| 3               | 1.89         |
-| 4               | 2.07         |
-| 8               | 2.52         |
+Returns memories that are candidates for forgetting.
 
 ---
 
-## Tech Stack
+## Forget Low-Score Memories
 
-Backend:
+```http
+POST /memory/forget_low_score
+```
+
+Marks weak memories as inactive.
+
+---
+
+# Automatic Memory Creation
+
+![Agent Memory](docs/agent_memory.png)
+
+The memory agent can automatically create new memories from user interactions and store them into the vector memory system.
+
+Example:
+
+```json
+{
+  "source": "agent_auto_memory",
+  "type": "conversation",
+  "memory_score": 1.0,
+  "is_active": true
+}
+```
+
+---
+
+# Tech Stack
+
+## Backend
 
 - FastAPI
 - FAISS
-- SentenceTransformers
 - NumPy
+- SentenceTransformers
+- Pydantic
 
-Frontend:
+## Frontend
 
 - React
+- Vite
 - Axios
 - Recharts
 
-LLM:
+---
 
-- OpenAI API (optional)
-- Mock LLM mode
+# Project Structure
+
+```text
+MemoryRAG/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── memory/
+│   │   └── rag/
+│   │
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   └── package.json
+│
+├── docs/
+│   └──pics
+│
+└── README.md
+```
 
 ---
 
-## Future Work
+# Run Backend
 
-- GPT-4o Integration
-- Multi-user Memory
-- Persistent Storage
-- Memory Forgetting Policies
-- Agent Memory Management
-- Long-Horizon Planning
+```bash
+cd backend
+
+python -m venv venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+python -m uvicorn app.main:app --reload
+```
+
+Backend:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger:
+
+```text
+http://127.0.0.1:8000/docs
+```
 
 ---
 
-## License
+# Run Frontend
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# Environment Variables
+
+Create:
+
+```text
+backend/.env
+```
+
+Example:
+
+```text
+OPENAI_API_KEY=your_api_key_here
+```
+
+Do not commit `.env`.
+
+---
+
+# Future Directions
+
+- Persistent database storage
+- Multi-user memory management
+- Multi-modal memory support
+- Real LLM integration
+- Long-term memory summarization
+- Agent planning and reflection
+
+---
+
+# License
 
 MIT License

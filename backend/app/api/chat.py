@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from app.core.state import embedder, vector_store
 from app.core.llm import generate_answer
+from app.memory.memory_agent import MemoryAgent
 
 router = APIRouter()
 
@@ -29,8 +30,29 @@ def chat(req: ChatRequest):
         context
     )
 
+    agent_memory_saved = False
+
+    if MemoryAgent.should_save_memory(req.query, answer):
+        memory = MemoryAgent.build_memory(
+            req.query,
+            answer
+        )
+
+        memory_embedding = embedder.encode(
+            [memory["text"]]
+        )
+
+        vector_store.add(
+            memory_embedding,
+            [memory["text"]],
+            [memory["metadata"]]
+        )
+
+        agent_memory_saved = True
+
     return {
         "query": req.query,
         "answer": answer,
-        "retrieved": retrieved
+        "retrieved": retrieved,
+        "agent_memory_saved": agent_memory_saved
     }
