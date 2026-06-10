@@ -4,6 +4,7 @@ MemoryRAG is a long-term conversational memory retrieval system built with FastA
 
 The system extends traditional Retrieval-Augmented Generation (RAG) by introducing memory reinforcement, memory decay, memory analytics, forgetting mechanisms, and automatic memory updates.
 
+![Architecture](docs/architecture.svg)
 ---
 
 # Features
@@ -106,6 +107,19 @@ Importance × Retrieval Reinforcement × Recency Factor
 
 Frequently accessed memories gain higher scores, while inactive memories gradually decay.
 
+
+---
+# Agent Memory
+
+This system extends basic vector memory into an agent-style memory module.
+
+It supports:
+
+- Memory type classification: semantic, episodic, preference, task
+- Importance scoring for long-term memory retention
+- Retention score calculation based on importance, access frequency, and recency
+- Forgetting candidate detection
+- Reflection-based memory consolidation
 ---
 
 # APIs
